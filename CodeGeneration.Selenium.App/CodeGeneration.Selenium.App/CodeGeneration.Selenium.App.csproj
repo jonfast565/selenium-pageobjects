@@ -9,7 +9,7 @@
     <None Include="Templates\CSharpCode.liquid">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <Compile Include="Program.fs" />
+    <Compile Include="Program.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CodeGeneration.Selenium.Models\CodeGeneration.Selenium.Models.csproj" />
-    <ProjectReference Include="..\CodeGeneration.Selenium\CodeGeneration.Selenium.csproj" />
   </ItemGroup>
 
   <ItemGroup>
