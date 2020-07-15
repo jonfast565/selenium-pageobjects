@@ -1,1 +1,8 @@
-﻿
+﻿namespace PageObjects {
+
+class Object {
+{% for Inputs in Elements.InputElements %}
+    public {{ Inputs.Type | capitalize }} {{ Inputs.Id }} { get; set; }
+{% endfor %}
+    }
+}

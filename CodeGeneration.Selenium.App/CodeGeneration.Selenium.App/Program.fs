@@ -4,28 +4,42 @@ open System
 open AngleSharp
 open AngleSharp.Dom
 open Newtonsoft.Json
+open Newtonsoft.Json.Converters
+open DotLiquid
+open System.IO
+open System.Dynamic
 
 type DomElement (tag: string, id: string, classes: string) =
     member this.Tag = tag
     member this.Id = id
     member this.Classes = classes
+    interface ILiquidizable with
+        member this.ToLiquid(): obj = this :> obj
 
 type ButtonElement (id: string, classes: string) =
     inherit DomElement("button", id, classes)
+    interface ILiquidizable with
+        member this.ToLiquid(): obj = this :> obj
 
 type OptionsElement(id: string, classes: string, name: string, value: string) =
     inherit DomElement("option", id, classes)
     member this.Name = name
     member this.Value = value
+    interface ILiquidizable with
+        member this.ToLiquid(): obj = this :> obj
 
 type SelectElement (id: string, classes: string, options: List<OptionsElement>) = 
     inherit DomElement("select", id, classes)
     member this.Options = options
+    interface ILiquidizable with
+        member this.ToLiquid(): obj = this :> obj
 
 type InputCheckboxElement (id: string, classes: string, name: string, currentValue : bool) =
     inherit DomElement("input", id, classes)
     member this.Name = name
     member this.CurrentValue = currentValue
+    interface ILiquidizable with
+        member this.ToLiquid(): obj = this :> obj
        
 type InputElement (id: string, classes: string, name: string, typeName: string, placeholder: string, currentValue: string) =
     inherit DomElement("input", id, classes)
@@ -33,12 +47,16 @@ type InputElement (id: string, classes: string, name: string, typeName: string, 
     member this.Placeholder = placeholder
     member this.CurrentValue = currentValue
     member this.TypeName = typeName
+    interface ILiquidizable with
+        member this.ToLiquid(): obj = this :> obj
 
 type SplitDomElements (inputElements: List<InputElement>, selectElements: List<SelectElement>, buttonElements: List<ButtonElement>, checkboxElements: List<InputCheckboxElement>) =
     member this.InputElements = inputElements
     member this.SelectElements = selectElements
     member this.ButtonElements = buttonElements
     member this.CheckboxElements = checkboxElements
+    interface ILiquidizable with
+        member this.ToLiquid(): obj = this :> obj
 
 let rootSelector = "body"
 let elementSelectors = [ //"a"; "button"; 
@@ -102,7 +120,13 @@ let divvyElementsByType (elements: List<IElement>) =
     splitDomElements
     
 let generateCode splitElements = 
-    1=1
+    let template = Template.Parse(File.ReadAllText("./Templates/CSharpCode.liquid"))
+    let elementRoot = JsonConvert.DeserializeObject<ExpandoObject>(JsonConvert.SerializeObject(splitElements), new ExpandoObjectConverter())
+    let expandoDict = new System.Collections.Generic.Dictionary<string, obj>(elementRoot)
+    let hash = Hash.FromDictionary(expandoDict)
+    let rendered = template.Render(hash)
+    Directory.CreateDirectory("./Results") |> ignore
+    File.WriteAllText("./Results/CSharpCode.cs", rendered)
 
 [<EntryPoint>]
 let main argv =
@@ -115,11 +139,11 @@ let main argv =
     let page = getPageByUrl pageUrl
     let elements = getElements page rootSelector
 
-    let splitElements = divvyElementsByType elements
+    let splitElements = {| Elements = divvyElementsByType elements |}
 
     if debug then
         printfn "%s" <| JsonConvert.SerializeObject(splitElements, Formatting.Indented)
 
-    
+    generateCode splitElements |> ignore
     
     0
