@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="Templates\CSharpCode.liquid" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
@@ -17,5 +18,7 @@
   <ItemGroup>
     <PackageReference Update="FSharp.Core" Version="4.7.2" />
   </ItemGroup>
+
+  <ItemGroup />
 
 </Project>
