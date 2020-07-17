@@ -1,23 +1,23 @@
 ﻿using DotLiquid;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace CodeGeneration.Selenium.Models
 {
-    public class InputElement : DomElement, ILiquidizable
+    public class LinkElement : DomElement, ILiquidizable
     {
         private static int _number;
 
-        public InputElement(string id, string classes, string name, string typeName, string value) : base("input", id, classes, $"Input{_number++}")
+        public LinkElement(string id, string classes, string href, string value) : base("a", id, classes, $"Link{_number++}")
         {
-            Name = name;
-            TypeName = typeName;
+            Href = href;
             Value = value;
         }
 
         public string Value { get; set; }
 
-        public string Name { get; set; }
-
-        public string TypeName { get; set; }
+        public string Href { get; set; }
 
         public object ToLiquid()
         {
@@ -27,8 +27,8 @@ namespace CodeGeneration.Selenium.Models
                 Tag,
                 Id,
                 Classes,
-                Name,
-                TypeName
+                Href,
+                Value
             };
         }
     }

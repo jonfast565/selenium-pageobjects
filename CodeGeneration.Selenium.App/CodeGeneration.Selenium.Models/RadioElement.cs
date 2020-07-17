@@ -5,11 +5,11 @@ using DotLiquid;
 
 namespace CodeGeneration.Selenium.Models
 {
-    public class ButtonElement : DomElement, ILiquidizable
+    public class RadioElement : DomElement, ILiquidizable
     {
         private static int _number;
 
-        public ButtonElement(string id, string classes) : base("button", id, classes, $"Button{_number++}")
+        public RadioElement(string id, string classes) : base("radio", id, classes, $"Radio{_number++}")
         {
 
         }

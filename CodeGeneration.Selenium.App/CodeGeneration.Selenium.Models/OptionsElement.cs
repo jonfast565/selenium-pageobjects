@@ -8,7 +8,9 @@ namespace CodeGeneration.Selenium.Models
 {
     public class OptionsElement : DomElement, ILiquidizable
     {
-        public OptionsElement(string id, string classes, string name, string value) : base("option", id, classes)
+        private static int _number;
+
+        public OptionsElement(string id, string classes, string name, string value) : base("option", id, classes, $"Option{_number++}")
         {
             Name = name;
             Value = value;
@@ -23,6 +25,7 @@ namespace CodeGeneration.Selenium.Models
         {
             return new
             {
+                InternalValue,
                 Tag,
                 Id,
                 Classes,

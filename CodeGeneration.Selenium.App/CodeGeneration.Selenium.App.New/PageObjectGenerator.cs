@@ -1,9 +1,8 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using CodeGeneration.Selenium.Models;
 using DotLiquid;
 
-namespace CodeGeneration.Selenium
+namespace CodeGeneration.Selenium.App.New
 {
     public static class PageObjectGenerator
     {

@@ -1,0 +1,144 @@
+﻿// Generated Selenium page object
+// Author: Jon Fast
+// Last Modified Date: 7/15/2020
+
+using OpenQA.Selenium;
+using OpenQA.Selenium.Support.PageObjects;
+using OpenQA.Selenium.Support.UI;
+using System;
+using System.Collections.Generic;
+
+namespace Selenium.Testing.PageObjects
+{
+    public class {{name}}
+    {
+        private readonly IWebDriver _driver;
+        private readonly int _timeout = 15;
+        private readonly string _pageUrl;
+        private readonly string _pageTitle;
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public {{name}}(IWebDriver driver, string pageUrl, string pageTitle)
+        {
+            _driver = driver;
+            _pageUrl = pageUrl;
+            _pageTitle = pageTitle;
+            FillInitialValues();
+        }
+
+        /// <summary>
+        /// Navigate to the page that represents this control
+        /// </summary>
+        public {{name}} NavigateToPage()
+        {
+            _driver.Url = _pageUrl;
+            _driver.Navigate();
+            return this;
+        }
+
+        /// <summary>
+        /// Verifies that the page loaded
+        /// </summary>
+        public {{name}} VerifyPageLoaded()
+        {
+            new WebDriverWait(_driver, TimeSpan.FromSeconds(_timeout))
+                .Until(d => d.Title.Contains(_pageTitle));
+            return this;
+        }
+
+        /// <summary>
+        /// Verifies the page url
+        /// </summary>
+        public {{name}} VerifyPageUrl()
+        {
+            var wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(_timeout));
+            wait.Until(d =>
+            {
+                var url = d.Url.ToLowerInvariant();
+                return url.Contains(_pageUrl.ToLowerInvariant());
+            });
+            return this;
+        }
+
+    {% for Inputs in root.InputElements %}
+        /// <summary>
+        /// Field type is: {{Inputs.TypeName}}
+        /// </summary>
+        public IWebElement {{Inputs.Id}} { get; set; }
+    {% endfor %}
+
+        /// <summary>
+        /// Fills initial values of all web elements
+        /// </summary>
+        private void FillInitialValues()
+        {
+    {% for Inputs in root.InputElements %}
+            {{Inputs.Id}} = _driver.FindElement(By.Id("{{Inputs.Id}}"));
+    {% endfor %}
+
+    {% for Links in root.LinkElements %}
+            {{Links.InternalValue}} = _driver.FindElement(By.CssSelector("a[href^='{{Links.Href}}']"));
+    {% endfor %}
+        }
+
+    {% for Inputs in root.InputElements %}
+        {% if Inputs.TypeName == "submit" %}
+        /// <summary>
+        /// Clicks on the submit button referenced by id {{Inputs.Id}}
+        /// </summary>
+        public {{name}} Submit_{{Inputs.Id}}()
+        {
+            {{Inputs.Id}}.Click();
+            return this;
+        }
+        {% else %}
+        /// <summary>
+        /// Fills the input field referenced by id {{Inputs.Id}}
+        /// </summary>
+        public {{name}} Fill_{{Inputs.Id}}(string value)
+        {
+            {{Inputs.Id}}.SendKeys(value);
+            return this;
+        }
+        {% endif %}
+    {% endfor %}
+
+    {% for Links in root.LinkElements %}
+        /// <summary>
+        /// Link that points to {{Links.Href}}
+        /// </summary>
+        public IWebElement {{Links.InternalValue}} { get; set; }
+    {% endfor %}
+    {% for Links in root.LinkElements %}
+        /// <summary>
+        /// Clicks the link for the element that points to {{Links.Href}}
+        /// </summary>
+        public {{name}} Click_{{Links.InternalValue}}()
+        {
+            {{Links.InternalValue}}.Click();
+            return this;
+        }
+    {% endfor %}
+
+    {% for Radio in root.RadioElements %}
+        /// <summary>
+        /// Radio button {{Radio.Id}}
+        /// </summary>
+        public IWebElement {{Radio.Id}}
+
+    {% endfor %}
+
+    {% for Radio in root.RadioElements %}
+        /// <summary>
+        /// Clicks the radio button for the element that points to {{Radio.Id}}
+        /// </summary>
+        public {{name}} Click_{{Radio.Id}}()
+        {
+            {{Radio.Id}}.Click();
+            return this;
+        }
+    {% endfor %}
+    }
+}

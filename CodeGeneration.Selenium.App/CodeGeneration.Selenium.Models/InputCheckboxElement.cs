@@ -7,7 +7,9 @@ namespace CodeGeneration.Selenium.Models
 {
     public class InputCheckboxElement : DomElement, ILiquidizable
     {
-        public InputCheckboxElement(string id, string classes, string name, bool enabled) : base("checkbox", id, classes)
+        private static int _number;
+
+        public InputCheckboxElement(string id, string classes, string name, bool enabled) : base("checkbox", id, classes, $"Checkbox{_number++}")
         {
             Name = name;
             Enabled = enabled;
@@ -20,6 +22,7 @@ namespace CodeGeneration.Selenium.Models
         {
             return new
             {
+                InternalValue,
                 Tag,
                 Id,
                 Classes,
