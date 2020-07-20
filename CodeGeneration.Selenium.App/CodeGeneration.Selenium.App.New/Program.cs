@@ -14,16 +14,15 @@ namespace CodeGeneration.Selenium.App.New
 {
     internal class Program
     {
-        private const string RootSelector = "body";
-        private static string[] _elementSelectors = new[] {"a", "button", "input", "select", "textarea", "form"};
+        private static string[] _elementSelectors = {"a", "button", "input", "select", "textarea", "form"};
 
         private static async Task Main(string[] args)
         {
             var debug = true;
             Console.WriteLine("-- Selenium Page Object Generator --");
 
-            var pageObjectName = "NcdrRegistrySelectionPage";
-            var pageUrl = "C:\\Users\\jfast\\Desktop\\page.html";
+            var pageObjectName = "NcdrIndividualProfilePage";
+            var pageUrl = "C:\\Users\\jfast\\Desktop\\indivprof.html";
 
             var page = await GetPageByString(pageUrl);
             var elements = GetElements(page);
@@ -122,9 +121,6 @@ namespace CodeGeneration.Selenium.App.New
                     case "a":
                         linkElements.Add(new LinkElement(idValues, classValues, el.Attributes["href"]?.Value,
                             el.InnerHtml));
-                        break;
-                    case "radio":
-                        radioElements.Add(new RadioElement(idValues, classValues));
                         break;
                 }
             }

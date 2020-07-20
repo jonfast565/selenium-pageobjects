@@ -2,6 +2,7 @@
 // Author: Jon Fast
 // Last Modified Date: 7/15/2020
 
+using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.PageObjects;
 using OpenQA.Selenium.Support.UI;
@@ -25,7 +26,14 @@ namespace Selenium.Testing.PageObjects
             _driver = driver;
             _pageUrl = pageUrl;
             _pageTitle = pageTitle;
-            FillInitialValues();
+        }
+
+        public {{name}} ConstructPage() {
+            NavigateToPage()
+                .VerifyPageLoaded()
+                .VerifyPageUrl()
+                .FillInitialValues();
+            return this;
         }
 
         /// <summary>
@@ -68,19 +76,33 @@ namespace Selenium.Testing.PageObjects
         /// </summary>
         public IWebElement {{Inputs.Id}} { get; set; }
     {% endfor %}
+    
+    {% for Selects in root.SelectElements %}
+        /// <summary>
+        /// Select box for {{Selects.Id}}
+        /// </summary>
+        public SelectElement {{Selects.Id}} { get; set; }
+    {% endfor %}
+    
 
         /// <summary>
         /// Fills initial values of all web elements
         /// </summary>
-        private void FillInitialValues()
+        public {{name}} FillInitialValues()
         {
     {% for Inputs in root.InputElements %}
             {{Inputs.Id}} = _driver.FindElement(By.Id("{{Inputs.Id}}"));
     {% endfor %}
-
+    {% for Selects in root.SelectElements %}
+            {{Selects.Id}} = new SelectElement(_driver.FindElement(By.Id("{{Selects.Id}}")));
+    {% endfor %}
+/*
     {% for Links in root.LinkElements %}
+            // By.LinkText?
             {{Links.InternalValue}} = _driver.FindElement(By.CssSelector("a[href^='{{Links.Href}}']"));
     {% endfor %}
+*/
+            return this;
         }
 
     {% for Inputs in root.InputElements %}
@@ -90,6 +112,20 @@ namespace Selenium.Testing.PageObjects
         /// </summary>
         public {{name}} Submit_{{Inputs.Id}}()
         {
+            // ensure attached 
+            {{Inputs.Id}} = _driver.FindElement(By.Id("{{Inputs.Id}}"));
+            
+            // click the element
+            {{Inputs.Id}}.Click();
+            return this;
+        }
+        {% elsif Inputs.TypeName == "radio" %}
+        public {{name}} Select_{{Inputs.Id}}()
+        {
+            // ensure attached 
+            {{Inputs.Id}} = _driver.FindElement(By.Id("{{Inputs.Id}}"));
+            
+            // click the element
             {{Inputs.Id}}.Click();
             return this;
         }
@@ -99,18 +135,36 @@ namespace Selenium.Testing.PageObjects
         /// </summary>
         public {{name}} Fill_{{Inputs.Id}}(string value)
         {
-            {{Inputs.Id}}.SendKeys(value);
+            try 
+            {
+                // ensure attached 
+                {{Inputs.Id}} = _driver.FindElement(By.Id("{{Inputs.Id}}"));
+                
+                // clear old value and send new value to the web driver
+                {{Inputs.Id}}.Clear();
+                {{Inputs.Id}}.SendKeys(value);
+            }
+            catch (StaleElementReferenceException) 
+            {
+                Assert.Warn($"Selenium found {{Inputs.Id}} was not attached.");
+            }
+            catch (InvalidElementStateException)
+            {
+                Assert.Warn($"Selenium found that {{Inputs.Id}} was disabled or could not be manipulated at this time.");
+            }
             return this;
         }
         {% endif %}
     {% endfor %}
-
+/*
     {% for Links in root.LinkElements %}
         /// <summary>
         /// Link that points to {{Links.Href}}
         /// </summary>
         public IWebElement {{Links.InternalValue}} { get; set; }
     {% endfor %}
+*/
+/*
     {% for Links in root.LinkElements %}
         /// <summary>
         /// Clicks the link for the element that points to {{Links.Href}}
@@ -121,22 +175,43 @@ namespace Selenium.Testing.PageObjects
             return this;
         }
     {% endfor %}
-
-    {% for Radio in root.RadioElements %}
+*/
+    {% for Selects in root.SelectElements %}
         /// <summary>
-        /// Radio button {{Radio.Id}}
+        /// Selects an element in {{Selects.Id}} by its textual value
         /// </summary>
-        public IWebElement {{Radio.Id}}
-
-    {% endfor %}
-
-    {% for Radio in root.RadioElements %}
-        /// <summary>
-        /// Clicks the radio button for the element that points to {{Radio.Id}}
-        /// </summary>
-        public {{name}} Click_{{Radio.Id}}()
+        public {{name}} SelectValue_{{Selects.Id}}(string selection) 
         {
-            {{Radio.Id}}.Click();
+            var options = new List<string>
+            { 
+                {% for Options in Selects.Options %}
+                {% if forloop.last == true %}"{{Options.Name}}" {% else %} "{{Options.Name}}", {% endif %}
+                {% endfor %}
+            };
+            
+            // check for an invalid option used
+            // NOTE: may not work for dynamic elements
+            if (!options.Contains(selection)) 
+            {
+                throw new Exception($"Invalid selection: {selection} for dropdown {{Selects.Id}}");
+            }
+
+            try 
+            {
+                // ensure attached
+                {{Selects.Id}} = new SelectElement(_driver.FindElement(By.Id("{{Selects.Id}}")));
+            
+                // select the value from the dropdown by the literal value
+                {{Selects.Id}}.SelectByText(selection);
+            }
+            catch (StaleElementReferenceException) 
+            {
+                Assert.Warn($"Selenium found {{Selects.Id}} was not attached.");
+            }
+            catch (InvalidElementStateException)
+            {
+                Assert.Warn($"Selenium found that {{Selects.Id}} was disabled or could not be manipulated at this time.");
+            }
             return this;
         }
     {% endfor %}
