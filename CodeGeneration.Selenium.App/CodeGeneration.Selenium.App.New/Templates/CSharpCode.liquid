@@ -72,6 +72,7 @@ namespace Selenium.Testing.PageObjects
 
     {% for Inputs in root.InputElements %}
         /// <summary>
+        /// Field point to id: {{Inputs.Id}}
         /// Field type is: {{Inputs.TypeName}}
         /// </summary>
         public IWebElement {{Inputs.Id}} { get; set; }
@@ -96,12 +97,11 @@ namespace Selenium.Testing.PageObjects
     {% for Selects in root.SelectElements %}
             {{Selects.Id}} = new SelectElement(_driver.FindElement(By.Id("{{Selects.Id}}")));
     {% endfor %}
-/*
     {% for Links in root.LinkElements %}
             // By.LinkText?
-            {{Links.InternalValue}} = _driver.FindElement(By.CssSelector("a[href^='{{Links.Href}}']"));
+            {{Links.Id}} = _driver.FindElement(By.Id("{{Links.Id}}"));
     {% endfor %}
-*/
+
             return this;
         }
 
@@ -156,15 +156,12 @@ namespace Selenium.Testing.PageObjects
         }
         {% endif %}
     {% endfor %}
-/*
     {% for Links in root.LinkElements %}
         /// <summary>
         /// Link that points to {{Links.Href}}
         /// </summary>
         public IWebElement {{Links.Id}} { get; set; }
     {% endfor %}
-*/
-/*
     {% for Links in root.LinkElements %}
         /// <summary>
         /// Clicks the link for the element that points to {{Links.Href}}
@@ -175,7 +172,6 @@ namespace Selenium.Testing.PageObjects
             return this;
         }
     {% endfor %}
-*/
     {% for Selects in root.SelectElements %}
         /// <summary>
         /// Selects an element in {{Selects.Id}} by its textual value

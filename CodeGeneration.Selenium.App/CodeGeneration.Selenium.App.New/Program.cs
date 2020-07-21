@@ -21,7 +21,8 @@ namespace CodeGeneration.Selenium.App.New
         {
             Console.WriteLine("-- Selenium Page Object Generator --");
 
-            var files = Directory.GetFiles("C:\\Users\\jfast\\Desktop\\test_pages\\");
+            var dir = "C:\\Users\\jfast\\Desktop\\test_pages\\";
+            var files = Directory.GetFiles(dir);
 
             foreach (var file in files.Where(x => x.EndsWith(".html")))
             {
@@ -38,7 +39,7 @@ namespace CodeGeneration.Selenium.App.New
                 var splitElements = DivvyElementsByType(elements);
 
                 Console.WriteLine(JsonConvert.SerializeObject(splitElements, Formatting.Indented));
-                PageObjectGenerator.GenerateCode(pageObjectName, splitElements);
+                PageObjectGenerator.GenerateCode(pageObjectName, dir, splitElements);
             }
         }
 
