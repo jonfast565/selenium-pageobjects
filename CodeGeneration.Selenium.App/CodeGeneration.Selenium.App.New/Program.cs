@@ -19,7 +19,6 @@ namespace CodeGeneration.Selenium.App.New
 
         private static async Task Main(string[] args)
         {
-            var debug = true;
             Console.WriteLine("-- Selenium Page Object Generator --");
 
             var files = Directory.GetFiles("C:\\Users\\jfast\\Desktop\\test_pages\\");
@@ -38,11 +37,7 @@ namespace CodeGeneration.Selenium.App.New
                 var elements = GetElements(page);
                 var splitElements = DivvyElementsByType(elements);
 
-                if (debug)
-                {
-                    Console.WriteLine(JsonConvert.SerializeObject(splitElements, Formatting.Indented));
-                }
-
+                Console.WriteLine(JsonConvert.SerializeObject(splitElements, Formatting.Indented));
                 PageObjectGenerator.GenerateCode(pageObjectName, splitElements);
             }
         }
