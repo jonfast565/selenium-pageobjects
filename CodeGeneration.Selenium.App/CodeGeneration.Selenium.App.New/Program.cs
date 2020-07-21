@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,19 +22,29 @@ namespace CodeGeneration.Selenium.App.New
             var debug = true;
             Console.WriteLine("-- Selenium Page Object Generator --");
 
-            var pageObjectName = "NcdrIndividualProfilePage";
-            var pageUrl = "C:\\Users\\jfast\\Desktop\\indivprof.html";
+            var files = Directory.GetFiles("C:\\Users\\jfast\\Desktop\\test_pages\\");
 
-            var page = await GetPageByString(pageUrl);
-            var elements = GetElements(page);
-            var splitElements = DivvyElementsByType(elements);
-
-            if (debug)
+            foreach (var file in files.Where(x => x.EndsWith(".html")))
             {
-                Console.WriteLine(JsonConvert.SerializeObject(splitElements, Formatting.Indented));
-            }
+                var pageObjectName = file.Split("\\")
+                    .Last()
+                    .Replace(".html", string.Empty)
+                    .Split('_')
+                    .Aggregate((x, y) => x + " " + y);
+                pageObjectName = new CultureInfo("en-US", false).TextInfo.ToTitleCase(pageObjectName).Replace(" ", string.Empty);
+                var pageUrl = file;
 
-            PageObjectGenerator.GenerateCode(pageObjectName, splitElements);
+                var page = await GetPageByString(pageUrl);
+                var elements = GetElements(page);
+                var splitElements = DivvyElementsByType(elements);
+
+                if (debug)
+                {
+                    Console.WriteLine(JsonConvert.SerializeObject(splitElements, Formatting.Indented));
+                }
+
+                PageObjectGenerator.GenerateCode(pageObjectName, splitElements);
+            }
         }
 
         private static async Task<IDocument> GetPageByString(string pageUrl)

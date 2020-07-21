@@ -12,7 +12,7 @@ namespace CodeGeneration.Selenium.App.New
             var hash = Hash.FromAnonymousObject(new { root = sde, name = pageObjectName });
             var rendered = template.Render(hash);
             Directory.CreateDirectory("./Results");
-            File.WriteAllText("./Results/CSharpCode.cs", rendered);
+            File.WriteAllText($"./Results/{pageObjectName}.cs", rendered);
         }
     }
 }

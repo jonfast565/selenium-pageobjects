@@ -27,7 +27,7 @@ namespace CodeGeneration.Selenium.Models
             SelectElements = selectElements;
             ButtonElements = buttonElements;
             CheckboxElements = checkboxElements;
-            LinkElements = linkElements.Where(x => x.Href != null).ToList();
+            LinkElements = linkElements.Where(x => x.Href != null && x.Id != null).ToList();
             RadioElements = radioElements;
         }
 

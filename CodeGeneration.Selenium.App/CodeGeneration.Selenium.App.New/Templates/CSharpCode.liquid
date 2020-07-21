@@ -161,7 +161,7 @@ namespace Selenium.Testing.PageObjects
         /// <summary>
         /// Link that points to {{Links.Href}}
         /// </summary>
-        public IWebElement {{Links.InternalValue}} { get; set; }
+        public IWebElement {{Links.Id}} { get; set; }
     {% endfor %}
 */
 /*
@@ -169,9 +169,9 @@ namespace Selenium.Testing.PageObjects
         /// <summary>
         /// Clicks the link for the element that points to {{Links.Href}}
         /// </summary>
-        public {{name}} Click_{{Links.InternalValue}}()
+        public {{name}} Click_{{Links.Id}}()
         {
-            {{Links.InternalValue}}.Click();
+            {{Links.Id}}.Click();
             return this;
         }
     {% endfor %}
