@@ -9,7 +9,7 @@ namespace CodeGeneration.Selenium.Models
     {
         private static int _number;
 
-        public LinkElement(string id, string classes, string href, string value) : base("a", id, classes, $"Link{_number++}")
+        public LinkElement(string id, string classes, string href, string value, string variableName) : base("a", id, classes, $"Link{_number++}", variableName)
         {
             Href = href;
             Value = value;
@@ -28,7 +28,8 @@ namespace CodeGeneration.Selenium.Models
                 Id,
                 Classes,
                 Href,
-                Value
+                Value,
+                VariableName
             };
         }
     }

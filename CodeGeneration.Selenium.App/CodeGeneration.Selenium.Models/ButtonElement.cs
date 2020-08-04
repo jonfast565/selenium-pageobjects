@@ -9,7 +9,7 @@ namespace CodeGeneration.Selenium.Models
     {
         private static int _number;
 
-        public ButtonElement(string id, string classes) : base("button", id, classes, $"Button{_number++}")
+        public ButtonElement(string id, string classes, string variableName) : base("button", id, classes, $"Button{_number++}", variableName)
         {
 
         }
@@ -21,7 +21,8 @@ namespace CodeGeneration.Selenium.Models
                 InternalValue,
                 Tag,
                 Id,
-                Classes
+                Classes,
+                VariableName
             };
         }
     }

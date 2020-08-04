@@ -6,7 +6,7 @@ namespace CodeGeneration.Selenium.Models
     {
         private static int _number;
 
-        public InputElement(string id, string classes, string name, string typeName, string value) : base("input", id, classes, $"Input{_number++}")
+        public InputElement(string id, string classes, string name, string typeName, string value, string variableName) : base("input", id, classes, $"Input{_number++}", variableName)
         {
             Name = name;
             TypeName = typeName;
@@ -28,7 +28,8 @@ namespace CodeGeneration.Selenium.Models
                 Id,
                 Classes,
                 Name,
-                TypeName
+                TypeName,
+                VariableName
             };
         }
     }

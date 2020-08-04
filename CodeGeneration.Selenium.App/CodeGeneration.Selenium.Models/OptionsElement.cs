@@ -10,7 +10,7 @@ namespace CodeGeneration.Selenium.Models
     {
         private static int _number;
 
-        public OptionsElement(string id, string classes, string name, string value) : base("option", id, classes, $"Option{_number++}")
+        public OptionsElement(string id, string classes, string name, string value, string variableName) : base("option", id, classes, $"Option{_number++}", variableName)
         {
             Name = name;
             Value = value;
@@ -30,7 +30,8 @@ namespace CodeGeneration.Selenium.Models
                 Id,
                 Classes,
                 Name,
-                Value
+                Value,
+                VariableName
             };
         }
     }

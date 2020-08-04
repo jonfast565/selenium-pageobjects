@@ -10,12 +10,12 @@ namespace CodeGeneration.Selenium.Models
     public class SelectElement : DomElement, ILiquidizable
     {
         private static int _number;
-        public SelectElement(string id, string classes, List<OptionsElement> options) : base("select", id, classes, $"Select{_number++}")
+        public SelectElement(string id, string classes, List<OptionsElement> options, string variableName) : base("select", id, classes, $"Select{_number++}", variableName)
         {
             Options = options;
         }
 
-        public SelectElement(string id, string classes, FSharpList<OptionsElement> options) : base("select", id, classes, $"Select{_number++}")
+        public SelectElement(string id, string classes, FSharpList<OptionsElement> options, string variableName) : base("select", id, classes, $"Select{_number++}", variableName)
         {
             Options = options.ToList();
         }
@@ -30,7 +30,8 @@ namespace CodeGeneration.Selenium.Models
                 Tag,
                 Id,
                 Classes,
-                Options
+                Options,
+                VariableName
             };
         }
     }

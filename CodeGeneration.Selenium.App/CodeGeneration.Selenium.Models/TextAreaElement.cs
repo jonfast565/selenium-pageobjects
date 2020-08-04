@@ -1,15 +1,15 @@
-﻿using System;
+﻿using DotLiquid;
+using System;
 using System.Collections.Generic;
 using System.Text;
-using DotLiquid;
 
 namespace CodeGeneration.Selenium.Models
 {
-    public class RadioElement : DomElement, ILiquidizable
+    public class TextAreaElement : DomElement, ILiquidizable
     {
         private static int _number;
 
-        public RadioElement(string id, string classes, string variableName) : base("radio", id, classes, $"Radio{_number++}", variableName)
+        public TextAreaElement(string id, string classes, string variableName) : base("textarea", id, classes, $"TextArea{_number++}", variableName)
         {
 
         }

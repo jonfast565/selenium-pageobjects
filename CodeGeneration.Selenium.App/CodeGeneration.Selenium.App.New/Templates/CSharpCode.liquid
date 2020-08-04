@@ -18,6 +18,42 @@ namespace Selenium.Testing.PageObjects
         private readonly string _pageUrl;
         private readonly string _pageTitle;
 
+     {% for Inputs in root.InputElements %}
+        /// <summary>
+        /// Field point to id: {{Inputs.Id}}
+        /// Field type is: {{Inputs.TypeName}}
+        /// </summary>
+        public IWebElement {{Inputs.VariableName}} { get; set; }
+    {% endfor %}
+    
+    {% for Selects in root.SelectElements %}
+        /// <summary>
+        /// Select box for {{Selects.Id}}
+        /// </summary>
+        public SelectElement {{Selects.VariableName}} { get; set; }
+    {% endfor %}
+    
+    {% for Buttons in root.ButtonElements %}
+        /// <summary>
+        /// Non-form Button element for {{Buttons.Id}}
+        /// </summary>
+        public IWebElement {{Buttons.VariableName}} { get; set; }
+    {% endfor %}
+
+    {% for Links in root.LinkElements %}
+        /// <summary>
+        /// Link that points to {{Links.Href}}
+        /// </summary>
+        public IWebElement {{Links.VariableName}} { get; set; }
+    {% endfor %}
+
+    {% for TextAreas in root.TextAreaElements %}
+        /// <summary>
+        /// Text area element with id {{TextAreas.Id}}
+        /// </summary>
+        public IWebElement {{TextAreas.VariableName}} { get; set; }
+    {% endfor %}
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -70,38 +106,31 @@ namespace Selenium.Testing.PageObjects
             return this;
         }
 
-    {% for Inputs in root.InputElements %}
-        /// <summary>
-        /// Field point to id: {{Inputs.Id}}
-        /// Field type is: {{Inputs.TypeName}}
-        /// </summary>
-        public IWebElement {{Inputs.Id}} { get; set; }
-    {% endfor %}
-    
-    {% for Selects in root.SelectElements %}
-        /// <summary>
-        /// Select box for {{Selects.Id}}
-        /// </summary>
-        public SelectElement {{Selects.Id}} { get; set; }
-    {% endfor %}
-    
-
         /// <summary>
         /// Fills initial values of all web elements
         /// </summary>
         public {{name}} FillInitialValues()
         {
     {% for Inputs in root.InputElements %}
-            {{Inputs.Id}} = _driver.FindElement(By.Id("{{Inputs.Id}}"));
+            // init inputs
+            {{Inputs.VariableName}} = _driver.FindElement(By.Id("{{Inputs.Id}}"));
     {% endfor %}
     {% for Selects in root.SelectElements %}
-            {{Selects.Id}} = new SelectElement(_driver.FindElement(By.Id("{{Selects.Id}}")));
+            // init select
+            {{Selects.VariableName}} = new SelectElement(_driver.FindElement(By.Id("{{Selects.Id}}")));
     {% endfor %}
     {% for Links in root.LinkElements %}
-            // By.LinkText?
-            {{Links.Id}} = _driver.FindElement(By.Id("{{Links.Id}}"));
+            // init links (do not find by link text)
+            {{Links.VariableName}} = _driver.FindElement(By.Id("{{Links.Id}}"));
     {% endfor %}
-
+    {% for Buttons in root.ButtonElements %}
+            // init button
+            {{Buttons.VariableName}} = _driver.FindElement(By.Id("{{Buttons.Id}}"));
+    {% endfor %}
+    {% for TextAreas in root.TextAreaElements %}
+            // init textarea
+            {{TextAreas.VariableName}} = _driver.FindElement(By.Id("{{TextAreas.Id}}"));
+    {% endfor %}
             return this;
         }
 
@@ -110,39 +139,39 @@ namespace Selenium.Testing.PageObjects
         /// <summary>
         /// Clicks on the submit button referenced by id {{Inputs.Id}}
         /// </summary>
-        public {{name}} Submit_{{Inputs.Id}}()
+        public {{name}} Submit_{{Inputs.VariableName}}()
         {
             // ensure attached 
-            {{Inputs.Id}} = _driver.FindElement(By.Id("{{Inputs.Id}}"));
+            {{Inputs.VariableName}} = _driver.FindElement(By.Id("{{Inputs.Id}}"));
             
             // click the element
-            {{Inputs.Id}}.Click();
+            {{Inputs.VariableName}}.Click();
             return this;
         }
         {% elsif Inputs.TypeName == "radio" %}
-        public {{name}} Select_{{Inputs.Id}}()
+        public {{name}} Select_{{Inputs.VariableName}}()
         {
             // ensure attached 
-            {{Inputs.Id}} = _driver.FindElement(By.Id("{{Inputs.Id}}"));
+            {{Inputs.VariableName}} = _driver.FindElement(By.Id("{{Inputs.Id}}"));
             
             // click the element
-            {{Inputs.Id}}.Click();
+            {{Inputs.VariableName}}.Click();
             return this;
         }
         {% else %}
         /// <summary>
         /// Fills the input field referenced by id {{Inputs.Id}}
         /// </summary>
-        public {{name}} Fill_{{Inputs.Id}}(string value)
+        public {{name}} Fill_{{Inputs.VariableName}}(string value)
         {
             try 
             {
                 // ensure attached 
-                {{Inputs.Id}} = _driver.FindElement(By.Id("{{Inputs.Id}}"));
+                {{Inputs.VariableName}} = _driver.FindElement(By.Id("{{Inputs.Id}}"));
                 
                 // clear old value and send new value to the web driver
-                {{Inputs.Id}}.Clear();
-                {{Inputs.Id}}.SendKeys(value);
+                {{Inputs.VariableName}}.Clear();
+                {{Inputs.VariableName}}.SendKeys(value);
             }
             catch (StaleElementReferenceException) 
             {
@@ -156,27 +185,61 @@ namespace Selenium.Testing.PageObjects
         }
         {% endif %}
     {% endfor %}
-    {% for Links in root.LinkElements %}
+
+    {% for TextAreas in root.TextAreaElements %}
         /// <summary>
-        /// Link that points to {{Links.Href}}
+        /// Fills the text area referenced by id {{TextAreas.Id}}
         /// </summary>
-        public IWebElement {{Links.Id}} { get; set; }
+        public {{name}} Fill_{{TextAreas.VariableName}}(string value)
+        {
+            try 
+            {
+                // ensure attached 
+                {{TextAreas.VariableName}} = _driver.FindElement(By.Id("{{TextAreas.Id}}"));
+                
+                // clear old value and send new value to the web driver
+                {{TextAreas.VariableName}}.Clear();
+                {{TextAreas.VariableName}}.SendKeys(value);
+            }
+            catch (StaleElementReferenceException) 
+            {
+                Assert.Warn($"Selenium found {{TextAreas.Id}} was not attached.");
+            }
+            catch (InvalidElementStateException)
+            {
+                Assert.Warn($"Selenium found that {{TextAreas.Id}} was disabled or could not be manipulated at this time.");
+            }
+            return this;
+        }
     {% endfor %}
+
     {% for Links in root.LinkElements %}
         /// <summary>
         /// Clicks the link for the element that points to {{Links.Href}}
         /// </summary>
-        public {{name}} Click_{{Links.Id}}()
+        public {{name}} Click_{{Links.VariableName}}()
         {
-            {{Links.Id}}.Click();
+            {{Links.VariableName}}.Click();
             return this;
         }
     {% endfor %}
+
+    {% for Buttons in root.ButtonElements%}
+        /// <summary>
+        /// Clicks the button for the element that points to {{Buttons.Id}}
+        /// </summary>
+        public {{name}} Click_{{Buttons.VariableName}}()
+        {
+            {{Buttons.VariableName}}.Click();
+            return this;
+        }
+    {% endfor %}
+
     {% for Selects in root.SelectElements %}
         /// <summary>
         /// Selects an element in {{Selects.Id}} by its textual value
         /// </summary>
-        public {{name}} SelectValue_{{Selects.Id}}(string selection) 
+        public {{name}} SelectValue_{{Selects.VariableName}}(string selection) 
         {
             var options = new List<string>
             { 
@@ -195,10 +258,10 @@ namespace Selenium.Testing.PageObjects
             try 
             {
                 // ensure attached
-                {{Selects.Id}} = new SelectElement(_driver.FindElement(By.Id("{{Selects.Id}}")));
+                {{Selects.VariableName}} = new SelectElement(_driver.FindElement(By.Id("{{Selects.Id}}")));
             
                 // select the value from the dropdown by the literal value
-                {{Selects.Id}}.SelectByText(selection);
+                {{Selects.VariableName}}.SelectByText(selection);
             }
             catch (StaleElementReferenceException) 
             {

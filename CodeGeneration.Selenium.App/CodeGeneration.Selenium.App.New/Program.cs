@@ -9,19 +9,21 @@ using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
 using CodeGeneration.Selenium.Models;
+using DotLiquid;
 using Newtonsoft.Json;
 
 namespace CodeGeneration.Selenium.App.New
 {
     internal class Program
     {
-        private static string[] _elementSelectors = {"a", "button", "input", "select", "textarea", "form"};
+        private static string[] _elementSelectors = { "a", "button", "input", "select", "textarea", "form" };
+        private static int _counter = 0;
 
         private static async Task Main(string[] args)
         {
             Console.WriteLine("-- Selenium Page Object Generator --");
 
-            var dir = "C:\\Users\\jfast\\Desktop\\test_pages\\";
+            var dir = "C:\\Users\\jfast\\Desktop\\";
             var files = Directory.GetFiles(dir);
 
             foreach (var file in files.Where(x => x.EndsWith(".html")))
@@ -51,7 +53,7 @@ namespace CodeGeneration.Selenium.App.New
             }
 
             var pageContents = await File.ReadAllTextAsync(pageUrl);
-            var htmlParser = new HtmlParser(options: new HtmlParserOptions {IsStrictMode = false});
+            var htmlParser = new HtmlParser(options: new HtmlParserOptions { IsStrictMode = false });
             var document = await htmlParser.ParseDocumentAsync(pageContents);
 
             return document;
@@ -77,6 +79,16 @@ namespace CodeGeneration.Selenium.App.New
             return _elementSelectors.SelectMany(page.QuerySelectorAll).ToList();
         }
 
+        private static string ProcessIdToVariable(IElement el)
+        {
+            var name = el.Id ?? $"UnnamedElement{_counter++}";
+            var textInfo = new CultureInfo("en-US", false).TextInfo;
+            var splitted = name.Replace("_", " ").Replace("-", " ").ToLowerInvariant();
+            var titleCase = textInfo.ToTitleCase(splitted);
+            var result = titleCase.Replace(" ", string.Empty);
+            return result;
+        }
+
         private static SplitDomElements DivvyElementsByType(List<IElement> elements)
         {
             var inputElements = new List<InputElement>();
@@ -85,60 +97,77 @@ namespace CodeGeneration.Selenium.App.New
             var checkboxElements = new List<InputCheckboxElement>();
             var linkElements = new List<LinkElement>();
             var radioElements = new List<RadioElement>();
+            var textAreaElements = new List<TextAreaElement>();
 
-            foreach (var el in elements)
+            var filteredElements = elements.Where(x => !string.IsNullOrEmpty(x.Id));
+            foreach (var el in filteredElements)
             {
                 var tagName = el.TagName.ToLower();
                 var idValues = el.Id;
                 var classValues = el.ClassName;
+                var variableName = ProcessIdToVariable(el);
 
                 switch (tagName)
                 {
                     case "input" when el.Attributes["type"].Value != "hidden":
-                    {
-                        if (el.Attributes["type"].Value == "checkbox")
                         {
-                            checkboxElements.Add(new InputCheckboxElement(idValues, classValues,
-                                el.Attributes["name"]?.Value,
-                                el.Attributes["checked"]?.Value == "checked"));
-                        }
-                        else
-                        {
-                            inputElements.Add(new InputElement(idValues, classValues, el.Attributes["name"].Value,
-                                el.Attributes["type"].Value, el.InnerHtml));
-                        }
+                            if (el.Attributes["type"].Value == "checkbox")
+                            {
+                                var name = el.Attributes["name"]?.Value;
+                                checkboxElements.Add(new InputCheckboxElement(idValues, classValues,
+                                    name,
+                                    name == "checked",
+                                    variableName));
+                            }
+                            else
+                            {
+                                var name = el.Attributes["name"]?.Value;
+                                var type = el.Attributes["type"]?.Value;
+                                inputElements.Add(new InputElement(idValues, classValues, name,
+                                    type, el.InnerHtml, variableName));
+                            }
 
-                        break;
-                    }
+                            break;
+                        }
                     case "button":
-                        buttonElements.Add(new ButtonElement(idValues, classValues));
+                        buttonElements.Add(new ButtonElement(idValues, classValues, variableName));
                         break;
                     case "select":
-                    {
-                        var optionsElements = new List<OptionsElement>();
-                        var options = el.QuerySelectorAll("option");
+                        {
+                            var optionsElements = new List<OptionsElement>();
+                            var options = el.QuerySelectorAll("option");
 
-                        optionsElements.AddRange(
-                            options.Select(x =>
-                                new OptionsElement(x.Id, x.Attributes["class"]?.Value, x.InnerHtml,
-                                    x.Attributes["value"]?.Value)));
-                        selectElements.Add(new SelectElement(idValues, classValues, optionsElements));
-                        break;
-                    }
+                            optionsElements.AddRange(
+                                options.Select(x =>
+                                {
+                                    var @class = x.Attributes["class"]?.Value;
+                                    var value = x.Attributes["value"]?.Value;
+                                    var optionsVariableName = ProcessIdToVariable(x);
+
+                                    return new OptionsElement(x.Id, @class, x.InnerHtml, value, optionsVariableName);
+                                }));
+
+                            selectElements.Add(new SelectElement(idValues, classValues, optionsElements, variableName));
+                            break;
+                        }
                     case "a":
-                        linkElements.Add(new LinkElement(idValues, classValues, el.Attributes["href"]?.Value,
-                            el.InnerHtml));
+                        var href = el.Attributes["href"]?.Value;
+                        linkElements.Add(new LinkElement(idValues, classValues, href, el.InnerHtml, variableName));
+                        break;
+                    case "textarea":
+                        textAreaElements.Add(new TextAreaElement(idValues, classValues, variableName));
                         break;
                 }
             }
 
             var result = new SplitDomElements(
-                inputElements, 
-                selectElements, 
-                buttonElements, 
-                checkboxElements, 
+                inputElements,
+                selectElements,
+                buttonElements,
+                checkboxElements,
                 linkElements,
-                radioElements);
+                radioElements,
+                textAreaElements);
 
             return result;
         }

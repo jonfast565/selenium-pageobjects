@@ -9,7 +9,7 @@ namespace CodeGeneration.Selenium.Models
     {
         private static int _number;
 
-        public InputCheckboxElement(string id, string classes, string name, bool enabled) : base("checkbox", id, classes, $"Checkbox{_number++}")
+        public InputCheckboxElement(string id, string classes, string name, bool enabled, string variableName) : base("checkbox", id, classes, $"Checkbox{_number++}", variableName)
         {
             Name = name;
             Enabled = enabled;
@@ -26,7 +26,8 @@ namespace CodeGeneration.Selenium.Models
                 Tag,
                 Id,
                 Classes,
-                Name
+                Name,
+                VariableName
             };
         }
     }

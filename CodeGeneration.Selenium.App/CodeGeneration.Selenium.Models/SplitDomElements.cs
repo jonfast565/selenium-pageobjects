@@ -14,6 +14,7 @@ namespace CodeGeneration.Selenium.Models
         public List<SelectElement> SelectElements { get; set; }
         public List<LinkElement> LinkElements { get; set; }
         public List<RadioElement> RadioElements { get; set; }
+        public List<TextAreaElement> TextAreaElements { get; set; }
 
         public SplitDomElements(
             List<InputElement> inputElements, 
@@ -21,7 +22,8 @@ namespace CodeGeneration.Selenium.Models
             List<ButtonElement> buttonElements, 
             List<InputCheckboxElement> checkboxElements,
             List<LinkElement> linkElements,
-            List<RadioElement> radioElements)
+            List<RadioElement> radioElements,
+            List<TextAreaElement> textAreaElements)
         {
             InputElements = inputElements;
             SelectElements = selectElements;
@@ -29,6 +31,7 @@ namespace CodeGeneration.Selenium.Models
             CheckboxElements = checkboxElements;
             LinkElements = linkElements.Where(x => x.Href != null && x.Id != null).ToList();
             RadioElements = radioElements;
+            TextAreaElements = textAreaElements;
         }
 
         public object ToLiquid()
@@ -39,7 +42,8 @@ namespace CodeGeneration.Selenium.Models
                 SelectElements,
                 ButtonElements,
                 CheckboxElements,
-                LinkElements
+                LinkElements,
+                TextAreaElements
             };
         }
     }
