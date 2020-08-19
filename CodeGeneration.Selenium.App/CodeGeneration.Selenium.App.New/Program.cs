@@ -23,7 +23,7 @@ namespace CodeGeneration.Selenium.App.New
         {
             Console.WriteLine("-- Selenium Page Object Generator --");
 
-            var dir = "C:\\Users\\jfast\\Desktop\\";
+            var dir = "C:\\Users\\jfast\\OneDrive - American College of Cardiology\\Desktop\\Pages";
             var files = Directory.GetFiles(dir);
 
             foreach (var file in files.Where(x => x.EndsWith(".html")))

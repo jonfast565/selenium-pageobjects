@@ -113,23 +113,58 @@ namespace Selenium.Testing.PageObjects
         {
     {% for Inputs in root.InputElements %}
             // init inputs
-            {{Inputs.VariableName}} = _driver.FindElement(By.Id("{{Inputs.Id}}"));
+            try 
+            {
+                {{Inputs.VariableName}} = _driver.FindElement(By.Id("{{Inputs.Id}}"));
+            }
+            catch (NoSuchElementException e) 
+            {
+                Assert.Warn("Element with {{Inputs.Id}} not in the document.");
+            }
     {% endfor %}
     {% for Selects in root.SelectElements %}
             // init select
-            {{Selects.VariableName}} = new SelectElement(_driver.FindElement(By.Id("{{Selects.Id}}")));
+            try
+            {
+                {{Selects.VariableName}} = new SelectElement(_driver.FindElement(By.Id("{{Selects.Id}}")));
+            }
+            catch (NoSuchElementException e) 
+            {
+                Assert.Warn("Element with {{Selects.Id}} not in the document.");
+            }
     {% endfor %}
     {% for Links in root.LinkElements %}
             // init links (do not find by link text)
-            {{Links.VariableName}} = _driver.FindElement(By.Id("{{Links.Id}}"));
+            try 
+            {
+                {{Links.VariableName}} = _driver.FindElement(By.Id("{{Links.Id}}"));
+            }
+            catch (NoSuchElementException e) 
+            {
+                Assert.Warn("Element with {{Links.Id}} not in the document.");
+            }
     {% endfor %}
     {% for Buttons in root.ButtonElements %}
             // init button
-            {{Buttons.VariableName}} = _driver.FindElement(By.Id("{{Buttons.Id}}"));
+            try 
+            {
+                {{Buttons.VariableName}} = _driver.FindElement(By.Id("{{Buttons.Id}}"));
+            }
+            catch (NoSuchElementException e)
+            {
+                Assert.Warn("Element with {{Buttons.Id}} not in the document.");
+            }
     {% endfor %}
     {% for TextAreas in root.TextAreaElements %}
             // init textarea
-            {{TextAreas.VariableName}} = _driver.FindElement(By.Id("{{TextAreas.Id}}"));
+            try
+            {
+                {{TextAreas.VariableName}} = _driver.FindElement(By.Id("{{TextAreas.Id}}"));
+            }
+            catch (NoSuchElementException e) 
+            {
+                Assert.Warn("Element with {{TextAreas.Id}} not in the document.");
+            }
     {% endfor %}
             return this;
         }
@@ -141,21 +176,53 @@ namespace Selenium.Testing.PageObjects
         /// </summary>
         public {{name}} Submit_{{Inputs.VariableName}}()
         {
-            // ensure attached 
-            {{Inputs.VariableName}} = _driver.FindElement(By.Id("{{Inputs.Id}}"));
+            try 
+            {
+                // ensure attached 
+                {{Inputs.VariableName}} = _driver.FindElement(By.Id("{{Inputs.Id}}"));
+
+                // click the element
+                {{Inputs.VariableName}}.Click();
+            }
+            catch (NoSuchElementException e) 
+            {
+                Assert.Warn($"Selenium could not find the element {{Inputs.Id}}")
+            }
+            catch (StaleElementReferenceException) 
+            {
+                Assert.Warn($"Selenium found {{Inputs.Id}} was not attached.");
+            }
+            catch (InvalidElementStateException)
+            {
+                Assert.Warn($"Selenium found that {{Inputs.Id}} was disabled or could not be manipulated at this time.");
+            }
             
-            // click the element
-            {{Inputs.VariableName}}.Click();
             return this;
         }
         {% elsif Inputs.TypeName == "radio" %}
         public {{name}} Select_{{Inputs.VariableName}}()
         {
-            // ensure attached 
-            {{Inputs.VariableName}} = _driver.FindElement(By.Id("{{Inputs.Id}}"));
+            try 
+            {
+                // ensure attached 
+                {{Inputs.VariableName}} = _driver.FindElement(By.Id("{{Inputs.Id}}"));
             
-            // click the element
-            {{Inputs.VariableName}}.Click();
+                // click the element
+                {{Inputs.VariableName}}.Click();
+            }
+            catch (NoSuchElementException e) 
+            {
+                Assert.Warn($"Selenium could not find the element {{Inputs.Id}}")
+            }
+            catch (StaleElementReferenceException) 
+            {
+                Assert.Warn($"Selenium found {{Inputs.Id}} was not attached.");
+            }
+            catch (InvalidElementStateException)
+            {
+                Assert.Warn($"Selenium found that {{Inputs.Id}} was disabled or could not be manipulated at this time.");
+            }
+
             return this;
         }
         {% else %}
@@ -172,6 +239,10 @@ namespace Selenium.Testing.PageObjects
                 // clear old value and send new value to the web driver
                 {{Inputs.VariableName}}.Clear();
                 {{Inputs.VariableName}}.SendKeys(value);
+            }
+            catch (NoSuchElementException e) 
+            {
+                Assert.Warn($"Selenium could not find the element {{Inputs.Id}}")
             }
             catch (StaleElementReferenceException) 
             {
@@ -201,6 +272,10 @@ namespace Selenium.Testing.PageObjects
                 {{TextAreas.VariableName}}.Clear();
                 {{TextAreas.VariableName}}.SendKeys(value);
             }
+            catch (NoSuchElementException e) 
+            {
+                Assert.Warn($"Selenium could not find the element {{TextAreas.Id}}")
+            }
             catch (StaleElementReferenceException) 
             {
                 Assert.Warn($"Selenium found {{TextAreas.Id}} was not attached.");
@@ -219,7 +294,22 @@ namespace Selenium.Testing.PageObjects
         /// </summary>
         public {{name}} Click_{{Links.VariableName}}()
         {
-            {{Links.VariableName}}.Click();
+            try
+            {
+                {{Links.VariableName}}.Click();
+            }
+            catch (NoSuchElementException e) 
+            {
+                Assert.Warn($"Selenium could not find the element {{Links.Id}}")
+            }
+            catch (StaleElementReferenceException) 
+            {
+                Assert.Warn($"Selenium found {{Links.Id}} was not attached.");
+            }
+            catch (InvalidElementStateException)
+            {
+                Assert.Warn($"Selenium found that {{Links.Id}} was disabled or could not be manipulated at this time.");
+            }
             return this;
         }
     {% endfor %}
@@ -230,7 +320,22 @@ namespace Selenium.Testing.PageObjects
         /// </summary>
         public {{name}} Click_{{Buttons.VariableName}}()
         {
-            {{Buttons.VariableName}}.Click();
+            try
+            {
+                {{Buttons.VariableName}}.Click();
+            }
+            catch (NoSuchElementException e) 
+            {
+                Assert.Warn($"Selenium could not find the element {{Buttons.Id}}")
+            }
+            catch (StaleElementReferenceException) 
+            {
+                Assert.Warn($"Selenium found {{Buttons.Id}} was not attached.");
+            }
+            catch (InvalidElementStateException)
+            {
+                Assert.Warn($"Selenium found that {{Buttons.Id}} was disabled or could not be manipulated at this time.");
+            }
             return this;
         }
     {% endfor %}
@@ -262,6 +367,10 @@ namespace Selenium.Testing.PageObjects
             
                 // select the value from the dropdown by the literal value
                 {{Selects.VariableName}}.SelectByText(selection);
+            }
+            catch (NoSuchElementException e) 
+            {
+                Assert.Warn($"Selenium could not find the element {{Selects.Id}}")
             }
             catch (StaleElementReferenceException) 
             {
