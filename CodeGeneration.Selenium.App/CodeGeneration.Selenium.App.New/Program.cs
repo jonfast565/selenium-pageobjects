@@ -23,11 +23,14 @@ namespace CodeGeneration.Selenium.App.New
         {
             Console.WriteLine("-- Selenium Page Object Generator --");
 
+            // TODO: Poor hard coding, why do you keep doing this to yourself...
+            // Console.ReadLine() << some path here.
             var dir = "C:\\Users\\jfast\\OneDrive - American College of Cardiology\\Desktop\\Pages";
             var files = Directory.GetFiles(dir);
 
             foreach (var file in files.Where(x => x.EndsWith(".html")))
             {
+                // TODO: Use system environment to determine delimiter
                 var pageObjectName = file.Split("\\")
                     .Last()
                     .Replace(".html", string.Empty)
@@ -60,6 +63,7 @@ namespace CodeGeneration.Selenium.App.New
 
         }
 
+        // TODO: doesn't work when cookies and logins are involved
         private static async Task<IDocument> GetPageByUrl(string pageUrl)
         {
             if (pageUrl == null)
